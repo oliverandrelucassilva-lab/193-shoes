@@ -9,6 +9,7 @@ export type ProductImage = {
   product_id: string;
   storage_path: string;
   position: number;
+  size: number | null;
   created_at: string;
 };
 

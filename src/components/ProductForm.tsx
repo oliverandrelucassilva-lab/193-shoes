@@ -110,9 +110,13 @@ export default function ProductForm({
         <h3 className="mb-2 text-sm font-semibold text-zinc-800">
           Estoque por tamanho
         </h3>
+        <p className="mb-2 text-xs text-zinc-500">
+          Quantidade em estoque e, se quiser, a foto daquele tamanho
+          específico (para compartilhar rápido com a cliente).
+        </p>
         <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-9">
           {SHOE_SIZES.map((size) => (
-            <label
+            <div
               key={size}
               className="flex flex-col items-center gap-1 rounded-md border border-zinc-200 p-2 text-xs"
             >
@@ -126,13 +130,19 @@ export default function ProductForm({
                 defaultValue={sizeQuantities.get(size) ?? 0}
                 className="w-full rounded border border-zinc-300 px-1 py-1 text-center"
               />
-            </label>
+              <input
+                type="file"
+                name={`size_photo_${size}`}
+                accept="image/*"
+                className="w-full text-[10px] file:mr-1 file:rounded file:border-0 file:bg-zinc-100 file:px-1 file:py-0.5"
+              />
+            </div>
           ))}
         </div>
       </div>
 
       <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-        Adicionar fotos
+        Outras fotos (gerais do produto)
         <input
           type="file"
           name="images"

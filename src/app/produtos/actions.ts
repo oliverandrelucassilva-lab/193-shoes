@@ -72,6 +72,28 @@ async function uploadImages(
 
     if (insertError) throw new Error(insertError.message);
   }
+
+  // Fotos específicas de cada tamanho (para compartilhar direto com o
+  // cliente quando ele pede o tamanho X), vindas dos campos size_photo_<n>.
+  for (const size of SHOE_SIZES) {
+    const file = formData.get(`size_photo_${size}`);
+    if (!(file instanceof File) || file.size === 0) continue;
+
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${productId}/tamanho-${size}-${randomUUID()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(path, file, { contentType: file.type });
+
+    if (uploadError) throw new Error(uploadError.message);
+
+    const { error: insertError } = await supabase
+      .from("product_images")
+      .insert({ product_id: productId, storage_path: path, size, position: 0 });
+
+    if (insertError) throw new Error(insertError.message);
+  }
 }
 
 export async function createProduct(formData: FormData) {
@@ -158,6 +180,35 @@ export async function deleteImage(imageId: string, productId: string) {
     .eq("id", imageId);
 
   if (error) throw new Error(error.message);
+
+  revalidatePath(`/produtos/${productId}`);
+}
+
+export async function uploadSizePhoto(
+  productId: string,
+  size: number,
+  formData: FormData
+) {
+  const file = formData.get("photo");
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Selecione uma foto.");
+  }
+
+  const supabase = await createClient();
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${productId}/tamanho-${size}-${randomUUID()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("product-images")
+    .upload(path, file, { contentType: file.type });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { error: insertError } = await supabase
+    .from("product_images")
+    .insert({ product_id: productId, storage_path: path, size, position: 0 });
+
+  if (insertError) throw new Error(insertError.message);
 
   revalidatePath(`/produtos/${productId}`);
 }

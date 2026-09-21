@@ -18,6 +18,10 @@ login para acessar qualquer página.
   custo, observações, fotos e quantidade em estoque por tamanho (33 a 41).
 - Ajuste rápido de estoque (botões +/-) sem precisar abrir o formulário
   inteiro.
+- **Foto por tamanho**: além das fotos gerais do produto, dá para guardar
+  uma foto específica de cada numeração. Quando a cliente pergunta por um
+  tamanho, é só abrir o produto e tocar em "Compartilhar" para mandar a
+  foto certa direto (WhatsApp, etc.), sem procurar na galeria do celular.
 - Cadastro/edição/exclusão de produtos, com upload de várias fotos.
 - Gestão dos modelos ("Modelos" no menu) — a loja cria os modelos que usa,
   já que calçados normalmente não têm nome próprio.
@@ -33,14 +37,19 @@ login para acessar qualquer página.
 3. Anote a **Project URL** e a **anon public key**, em
    `Project Settings > API`.
 
-### 2. Rodar a migration do banco de dados
+### 2. Rodar as migrations do banco de dados
 
 1. No painel do Supabase, abra `SQL Editor`.
 2. Cole o conteúdo do arquivo [`supabase/migrations/0001_init.sql`](./supabase/migrations/0001_init.sql)
-   e execute (`Run`).
-3. Isso cria as tabelas (`categories`, `products`, `product_images`,
-   `product_sizes`), o bucket de imagens (`product-images`) e as políticas
-   de segurança (só usuários logados acessam os dados).
+   e execute (`Run`). Isso cria as tabelas (`categories`, `products`,
+   `product_images`, `product_sizes`), o bucket de imagens
+   (`product-images`) e as políticas de segurança (só usuários logados
+   acessam os dados).
+3. Em seguida, cole e execute também o arquivo
+   [`supabase/migrations/0002_product_image_size.sql`](./supabase/migrations/0002_product_image_size.sql),
+   que habilita a foto por tamanho. Sempre que surgirem novos arquivos
+   `NNNN_*.sql` em `supabase/migrations/`, rode-os na ordem (pelo número)
+   no `SQL Editor`.
 
 ### 3. Criar o usuário de acesso da loja
 
