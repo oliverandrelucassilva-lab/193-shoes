@@ -1,7 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { hasSupabaseEnv } from "./env";
 
 export async function updateSession(request: NextRequest) {
+  const isSetupRoute = request.nextUrl.pathname.startsWith("/setup-pendente");
+
+  if (!hasSupabaseEnv()) {
+    if (isSetupRoute) return NextResponse.next({ request });
+    const url = request.nextUrl.clone();
+    url.pathname = "/setup-pendente";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

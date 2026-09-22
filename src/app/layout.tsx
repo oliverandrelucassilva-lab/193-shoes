@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import { createClient } from "@/lib/supabase/server";
+import { hasSupabaseEnv } from "@/lib/supabase/env";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,13 +20,19 @@ export const metadata: Metadata = {
   description: "Controle interno de estoque da loja",
 };
 
-export default async function RootLayout({
-  children,
-}: LayoutProps<"/">) {
+async function getCurrentUser() {
+  if (!hasSupabaseEnv()) return null;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  return user;
+}
+
+export default async function RootLayout({
+  children,
+}: LayoutProps<"/">) {
+  const user = await getCurrentUser();
 
   return (
     <html
