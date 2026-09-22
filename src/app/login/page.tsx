@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -38,10 +39,20 @@ function LoginForm() {
   return (
     <div className="flex flex-1 items-center justify-center bg-zinc-50 px-4">
       <div className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-1 text-xl font-semibold">Controle de Estoque</h1>
-        <p className="mb-6 text-sm text-zinc-500">
-          Acesso interno da loja de calçados
-        </p>
+        <div className="mb-6 flex flex-col items-center text-center">
+          <Image
+            src="/logo.png"
+            alt="193 Shoes"
+            width={88}
+            height={88}
+            className="mb-3 rounded-full"
+            priority
+          />
+          <h1 className="text-xl font-semibold">193 Shoes</h1>
+          <p className="text-sm text-zinc-500">
+            Controle interno de estoque
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">

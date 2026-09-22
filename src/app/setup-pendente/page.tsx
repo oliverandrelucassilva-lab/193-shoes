@@ -1,8 +1,17 @@
+import Image from "next/image";
+
 export default function SetupPendentePage() {
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
-      <span className="text-3xl">👠</span>
-      <h1 className="text-xl font-semibold">Quase lá!</h1>
+      <Image
+        src="/logo.png"
+        alt="193 Shoes"
+        width={72}
+        height={72}
+        className="rounded-full"
+        priority
+      />
+      <h1 className="text-xl font-semibold">193 Shoes — quase lá!</h1>
       <p className="text-sm text-zinc-600">
         O site já está publicado, mas ainda falta conectar o banco de dados
         (Supabase) para o estoque funcionar.
