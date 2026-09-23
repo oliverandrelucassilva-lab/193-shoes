@@ -37,7 +37,7 @@ export default function ShareImageButton({
       type="button"
       onClick={handleShare}
       disabled={status === "sharing"}
-      className="rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+      className="rounded-md bg-[var(--accent)] px-2 py-1 text-xs font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)] disabled:opacity-60"
     >
       {status === "sharing" ? "Abrindo..." : label}
     </button>

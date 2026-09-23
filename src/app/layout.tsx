@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/Nav";
+import Sidebar from "@/components/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 
@@ -27,6 +27,19 @@ export const metadata: Metadata = {
   },
 };
 
+// Aplica o tema salvo antes da primeira pintura, evitando flash claro/escuro.
+const themeInitScript = `
+(function () {
+  try {
+    var stored = localStorage.getItem("theme");
+    var theme = stored === "light" || stored === "dark"
+      ? stored
+      : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  } catch (e) {}
+})();
+`;
+
 async function getCurrentUser() {
   if (!hasSupabaseEnv()) return null;
   const supabase = await createClient();
@@ -46,9 +59,14 @@ export default async function RootLayout({
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        {user && <Nav userEmail={user.email ?? ""} />}
-        <div className="flex-1 flex flex-col">{children}</div>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-full">
+        <div className="flex min-h-screen flex-col md:flex-row">
+          {user && <Sidebar userEmail={user.email ?? ""} />}
+          <div className="flex flex-1 flex-col">{children}</div>
+        </div>
       </body>
     </html>
   );

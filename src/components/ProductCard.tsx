@@ -21,9 +21,9 @@ export default function ProductCard({
   return (
     <Link
       href={`/produtos/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition hover:shadow-md"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-sm transition hover:shadow-md"
     >
-      <div className="relative aspect-square w-full bg-zinc-100">
+      <div className="relative aspect-square w-full bg-[var(--surface-hover)]">
         {cover ? (
           <Image
             src={productImageUrl(cover.storage_path)}
@@ -33,7 +33,7 @@ export default function ProductCard({
             className="object-cover transition group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+          <div className="flex h-full items-center justify-center text-sm text-[var(--text-faint)]">
             Sem foto
           </div>
         )}
@@ -48,7 +48,7 @@ export default function ProductCard({
           </span>
         )}
         {!product.active && (
-          <span className="absolute right-2 top-2 rounded-full bg-zinc-700 px-2 py-0.5 text-xs font-medium text-white">
+          <span className="absolute right-2 top-2 rounded-full bg-[var(--text)] px-2 py-0.5 text-xs font-medium text-[var(--surface)]">
             Inativo
           </span>
         )}
@@ -56,35 +56,37 @@ export default function ProductCard({
 
       <div className="flex flex-1 flex-col gap-1 p-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold">
+          <span className="text-sm font-semibold text-[var(--text)]">
             {product.reference_code}
           </span>
           {product.price != null && (
-            <span className="text-sm font-medium text-zinc-700">
+            <span className="text-sm font-medium text-[var(--text)]">
               R$ {Number(product.price).toFixed(2)}
             </span>
           )}
         </div>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-[var(--text-muted)]">
           {product.category?.name ?? "Sem modelo"}
           {product.color ? ` · ${product.color}` : ""}
         </span>
 
         <div className="mt-2 flex flex-wrap gap-1">
           {availableSizes.length === 0 && (
-            <span className="text-xs text-zinc-400">Nenhum tamanho disponível</span>
+            <span className="text-xs text-[var(--text-faint)]">
+              Nenhum tamanho disponível
+            </span>
           )}
           {availableSizes.map((s) => (
             <span
               key={s.id}
-              className="rounded border border-zinc-300 px-1.5 py-0.5 text-[11px] text-zinc-600"
+              className="rounded border border-[var(--border)] px-1.5 py-0.5 text-[11px] text-[var(--text-muted)]"
             >
               {formatSize(s.size)} ({s.quantity})
             </span>
           ))}
         </div>
 
-        <span className="mt-auto pt-2 text-xs font-medium text-zinc-500">
+        <span className="mt-auto pt-2 text-xs font-medium text-[var(--text-muted)]">
           Total em estoque: {totalStock}
         </span>
       </div>

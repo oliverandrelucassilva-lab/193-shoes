@@ -68,8 +68,10 @@ export default async function DashboardPage({
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Estoque</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold text-[var(--text)]">
+            Estoque
+          </h1>
+          <p className="text-sm text-[var(--text-muted)]">
             {products.length} produto(s) · {totalPairs} par(es) em estoque
           </p>
         </div>
@@ -77,25 +79,25 @@ export default async function DashboardPage({
 
       <form
         method="get"
-        className="mb-6 grid grid-cols-2 gap-3 rounded-xl border border-zinc-200 bg-white p-4 sm:grid-cols-4"
+        className="mb-6 grid grid-cols-2 gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:grid-cols-4"
       >
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
           Buscar (código, cor...)
           <input
             type="text"
             name="busca"
             defaultValue={params.busca}
             placeholder="Ex: REF-1023"
-            className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
           Modelo
           <select
             name="categoria"
             defaultValue={params.categoria ?? ""}
-            className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
           >
             <option value="">Todos</option>
             {(categories ?? []).map((c) => (
@@ -106,12 +108,12 @@ export default async function DashboardPage({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
           Tamanho
           <select
             name="tamanho"
             defaultValue={params.tamanho ?? ""}
-            className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
           >
             <option value="">Todos</option>
             {SHOE_SIZES.map((s) => (
@@ -122,12 +124,12 @@ export default async function DashboardPage({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-zinc-600">
+        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
           Status
           <select
             name="status"
             defaultValue={params.status ?? "ativos"}
-            className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm"
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
           >
             <option value="ativos">Ativos</option>
             <option value="inativos">Inativos</option>
@@ -138,13 +140,13 @@ export default async function DashboardPage({
         <div className="col-span-2 flex items-end gap-2 sm:col-span-4">
           <button
             type="submit"
-            className="rounded-md bg-zinc-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-zinc-800"
+            className="rounded-lg bg-[var(--accent)] px-4 py-1.5 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
           >
             Filtrar
           </button>
           <Link
             href="/"
-            className="rounded-md border border-zinc-300 px-4 py-1.5 text-sm font-medium hover:bg-zinc-50"
+            className="rounded-lg border border-[var(--border)] px-4 py-1.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
           >
             Limpar
           </Link>
@@ -152,13 +154,13 @@ export default async function DashboardPage({
       </form>
 
       {error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+        <p className="rounded-lg bg-[var(--danger-bg)] px-3 py-2 text-sm text-[var(--danger)]">
           Erro ao carregar produtos: {error.message}
         </p>
       )}
 
       {!error && products.length === 0 && (
-        <div className="rounded-xl border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500">
+        <div className="rounded-2xl border border-dashed border-[var(--border)] p-10 text-center text-sm text-[var(--text-muted)]">
           Nenhum produto encontrado com esses filtros.
         </div>
       )}

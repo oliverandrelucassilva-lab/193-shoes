@@ -59,27 +59,31 @@ export default async function EditProductPage({
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{product.reference_code}</h1>
-          <p className="text-sm text-zinc-500">
+          <h1 className="text-2xl font-semibold text-[var(--text)]">
+            {product.reference_code}
+          </h1>
+          <p className="text-sm text-[var(--text-muted)]">
             {product.category?.name ?? "Sem modelo"}
           </p>
         </div>
         <form action={boundDelete}>
           <button
             type="submit"
-            className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+            className="rounded-lg border border-[var(--danger-border)] px-3 py-1.5 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger-bg)]"
           >
             Excluir produto
           </button>
         </form>
       </div>
 
-      <section className="mb-6">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-800">
+      <section className="mb-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <h2 className="mb-3 text-base font-semibold text-[var(--text)]">
           Fotos gerais
         </h2>
         {generalImages.length === 0 ? (
-          <p className="text-sm text-zinc-400">Nenhuma foto cadastrada.</p>
+          <p className="text-sm text-[var(--text-faint)]">
+            Nenhuma foto cadastrada.
+          </p>
         ) : (
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-5">
             {generalImages.map((img) => (
@@ -89,7 +93,7 @@ export default async function EditProductPage({
                   alt={product.reference_code}
                   fill
                   sizes="120px"
-                  className="rounded-md object-cover"
+                  className="rounded-lg object-cover"
                 />
                 <form
                   action={deleteImage.bind(null, img.id, product.id)}
@@ -108,35 +112,42 @@ export default async function EditProductPage({
         )}
       </section>
 
-      <section className="mb-8">
-        <h2 className="mb-2 text-sm font-semibold text-zinc-800">
+      <section className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <h2 className="text-base font-semibold text-[var(--text)]">
           Estoque e fotos por tamanho
         </h2>
-        <p className="mb-3 text-xs text-zinc-500">
+        <p className="mb-4 mt-1 text-xs text-[var(--text-muted)]">
           Ajuste a quantidade e guarde a foto de cada tamanho aqui: quando a
           cliente perguntar por um número, é só abrir e tocar em
           &quot;Compartilhar&quot; para enviar direto no WhatsApp.
         </p>
-        <div className="flex flex-col divide-y divide-zinc-200 rounded-xl border border-zinc-200 bg-white">
+        <div className="flex flex-col divide-y divide-[var(--border)] rounded-xl border border-[var(--border)]">
           {sizesSorted.map((s) => {
             const photos = imagesBySize.get(s.size) ?? [];
             return (
-              <div key={s.id} className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start">
+              <div
+                key={s.id}
+                className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start"
+              >
                 <div className="flex items-center gap-2 sm:w-32 sm:shrink-0">
-                  <span className="font-semibold">{formatSize(s.size)}</span>
+                  <span className="font-semibold text-[var(--text)]">
+                    {formatSize(s.size)}
+                  </span>
                   <form action={adjustStock.bind(null, product.id, s.size, -1)}>
                     <button
                       type="submit"
-                      className="h-6 w-6 rounded bg-zinc-100 text-sm hover:bg-zinc-200"
+                      className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
                     >
                       -
                     </button>
                   </form>
-                  <span className="w-5 text-center text-sm">{s.quantity}</span>
+                  <span className="w-5 text-center text-sm text-[var(--text)]">
+                    {s.quantity}
+                  </span>
                   <form action={adjustStock.bind(null, product.id, s.size, 1)}>
                     <button
                       type="submit"
-                      className="h-6 w-6 rounded bg-zinc-100 text-sm hover:bg-zinc-200"
+                      className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
                     >
                       +
                     </button>
@@ -152,7 +163,7 @@ export default async function EditProductPage({
                           alt={`Tamanho ${formatSize(s.size)}`}
                           fill
                           sizes="64px"
-                          className="rounded-md object-cover"
+                          className="rounded-lg object-cover"
                         />
                       </div>
                       <div className="flex flex-col gap-1">
@@ -166,7 +177,7 @@ export default async function EditProductPage({
                         >
                           <button
                             type="submit"
-                            className="text-xs text-red-600 underline"
+                            className="text-xs text-[var(--danger)] underline"
                           >
                             Remover
                           </button>
@@ -184,11 +195,11 @@ export default async function EditProductPage({
                       name="photo"
                       accept="image/*"
                       required
-                      className="text-xs file:mr-1 file:rounded file:border-0 file:bg-zinc-100 file:px-2 file:py-1"
+                      className="text-xs text-[var(--text-muted)] file:mr-1 file:rounded file:border-0 file:bg-[var(--surface-hover)] file:px-2 file:py-1 file:text-[var(--text)]"
                     />
                     <button
                       type="submit"
-                      className="rounded-md border border-zinc-300 px-2 py-1 text-xs font-medium hover:bg-zinc-50"
+                      className="rounded-lg border border-[var(--border)] px-2 py-1 text-xs font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
                     >
                       {photos.length > 0 ? "Adicionar outra" : "Adicionar foto"}
                     </button>
@@ -201,7 +212,7 @@ export default async function EditProductPage({
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-zinc-800">
+        <h2 className="mb-3 text-base font-semibold text-[var(--text)]">
           Editar produto
         </h2>
         <ProductForm

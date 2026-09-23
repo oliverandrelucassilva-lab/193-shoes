@@ -11,8 +11,10 @@ export default async function NewProductPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
-      <h1 className="mb-1 text-2xl font-semibold">Novo produto</h1>
-      <p className="mb-6 text-sm text-zinc-500">
+      <h1 className="mb-1 text-2xl font-semibold text-[var(--text)]">
+        Novo produto
+      </h1>
+      <p className="mb-6 text-sm text-[var(--text-muted)]">
         Cadastre um calçado novo, defina o modelo, as fotos e o estoque por
         tamanho.
       </p>

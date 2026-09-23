@@ -10,8 +10,10 @@ export default async function CategoriasPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
-      <h1 className="mb-1 text-2xl font-semibold">Modelos de calçado</h1>
-      <p className="mb-6 text-sm text-zinc-500">
+      <h1 className="mb-1 text-2xl font-semibold text-[var(--text)]">
+        Modelos de calçado
+      </h1>
+      <p className="mb-6 text-sm text-[var(--text-muted)]">
         Como os calçados geralmente não têm um nome próprio, organize o
         estoque pelos modelos da loja (sapatilha, slingback, sapato social,
         sandália...).
@@ -19,23 +21,23 @@ export default async function CategoriasPage() {
 
       <form
         action={createCategory}
-        className="mb-6 flex gap-2 rounded-xl border border-zinc-200 bg-white p-4"
+        className="mb-6 flex gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4"
       >
         <input
           name="name"
           required
           placeholder="Novo modelo, ex: Slingback"
-          className="flex-1 rounded-md border border-zinc-300 px-3 py-2 text-sm"
+          className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]"
         />
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
         >
           Adicionar
         </button>
       </form>
 
-      <ul className="flex flex-col divide-y divide-zinc-200 rounded-xl border border-zinc-200 bg-white">
+      <ul className="flex flex-col divide-y divide-[var(--border)] rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
         {(categories ?? []).map((category) => (
           <li
             key={category.id}
@@ -48,11 +50,11 @@ export default async function CategoriasPage() {
               <input
                 name="name"
                 defaultValue={category.name}
-                className="flex-1 rounded-md border border-zinc-300 px-2 py-1.5"
+                className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[var(--text)]"
               />
               <button
                 type="submit"
-                className="rounded-md border border-zinc-300 px-2 py-1.5 text-xs font-medium hover:bg-zinc-50"
+                className="rounded-lg border border-[var(--border)] px-2 py-1.5 text-xs font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
               >
                 Salvar
               </button>
@@ -60,7 +62,7 @@ export default async function CategoriasPage() {
             <form action={deleteCategory.bind(null, category.id)}>
               <button
                 type="submit"
-                className="rounded-md border border-red-300 px-2 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+                className="rounded-lg border border-[var(--danger-border)] px-2 py-1.5 text-xs font-medium text-[var(--danger)] hover:bg-[var(--danger-bg)]"
               >
                 Excluir
               </button>
@@ -68,7 +70,7 @@ export default async function CategoriasPage() {
           </li>
         ))}
         {(categories ?? []).length === 0 && (
-          <li className="p-4 text-sm text-zinc-400">
+          <li className="p-4 text-sm text-[var(--text-faint)]">
             Nenhum modelo cadastrado ainda.
           </li>
         )}

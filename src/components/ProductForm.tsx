@@ -2,6 +2,11 @@ import Link from "next/link";
 import { SHOE_SIZES, formatSize } from "@/lib/sizes";
 import type { Category, ProductWithRelations } from "@/types/database";
 
+const inputClass =
+  "rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-faint)] focus:border-[var(--accent)] focus:outline-none";
+const labelClass =
+  "flex flex-col gap-1 text-sm font-medium text-[var(--text)]";
+
 export default function ProductForm({
   categories,
   product,
@@ -19,98 +24,103 @@ export default function ProductForm({
 
   return (
     <form action={action} className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-          Código de referência *
-          <input
-            name="reference_code"
-            required
-            defaultValue={product?.reference_code}
-            placeholder="Ex: REF-1023"
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-          />
-        </label>
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <h2 className="mb-4 text-base font-semibold text-[var(--text)]">
+          Informações básicas
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className={labelClass}>
+            Código de referência *
+            <input
+              name="reference_code"
+              required
+              defaultValue={product?.reference_code}
+              placeholder="Ex: REF-1023"
+              className={inputClass}
+            />
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-          Modelo *
-          <select
-            name="category_id"
-            required
-            defaultValue={product?.category_id ?? ""}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-          >
-            <option value="" disabled>
-              Selecione...
-            </option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
+          <label className={labelClass}>
+            Modelo *
+            <select
+              name="category_id"
+              required
+              defaultValue={product?.category_id ?? ""}
+              className={inputClass}
+            >
+              <option value="" disabled>
+                Selecione...
               </option>
-            ))}
-          </select>
-        </label>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-          Cor
-          <input
-            name="color"
-            defaultValue={product?.color ?? ""}
-            placeholder="Ex: Nude"
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-          />
-        </label>
+          <label className={labelClass}>
+            Cor
+            <input
+              name="color"
+              defaultValue={product?.color ?? ""}
+              placeholder="Ex: Nude"
+              className={inputClass}
+            />
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-          Preço de venda (R$)
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            name="price"
-            defaultValue={product?.price ?? ""}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-          />
-        </label>
+          <label className={labelClass}>
+            Preço de venda (R$)
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="price"
+              defaultValue={product?.price ?? ""}
+              className={inputClass}
+            />
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-          Preço de custo (R$)
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            name="cost_price"
-            defaultValue={product?.cost_price ?? ""}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-          />
-        </label>
+          <label className={labelClass}>
+            Preço de custo (R$)
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="cost_price"
+              defaultValue={product?.cost_price ?? ""}
+              className={inputClass}
+            />
+          </label>
 
-        <label className="flex items-center gap-2 pt-6 text-sm font-medium text-zinc-700">
-          <input
-            type="checkbox"
-            name="active"
-            defaultChecked={product?.active ?? true}
-            className="h-4 w-4"
+          <label className="flex items-center gap-2 pt-6 text-sm font-medium text-[var(--text)]">
+            <input
+              type="checkbox"
+              name="active"
+              defaultChecked={product?.active ?? true}
+              className="h-4 w-4 accent-[var(--accent)]"
+            />
+            Produto ativo (aparece no estoque)
+          </label>
+        </div>
+
+        <label className={`${labelClass} mt-4`}>
+          Observações
+          <textarea
+            name="description"
+            rows={3}
+            defaultValue={product?.description ?? ""}
+            placeholder="Detalhes do calçado, fornecedor, etc."
+            className={inputClass}
           />
-          Produto ativo (aparece no estoque)
         </label>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-        Observações
-        <textarea
-          name="description"
-          rows={3}
-          defaultValue={product?.description ?? ""}
-          placeholder="Detalhes do calçado, fornecedor, etc."
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm"
-        />
-      </label>
-
-      <div>
-        <h3 className="mb-2 text-sm font-semibold text-zinc-800">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <h2 className="text-base font-semibold text-[var(--text)]">
           Estoque por tamanho
-        </h3>
-        <p className="mb-2 text-xs text-zinc-500">
+        </h2>
+        <p className="mb-4 mt-1 text-xs text-[var(--text-muted)]">
           Quantidade em estoque e, se quiser, a foto daquele tamanho
           específico (para compartilhar rápido com a cliente).
         </p>
@@ -118,9 +128,9 @@ export default function ProductForm({
           {SHOE_SIZES.map((size) => (
             <div
               key={size}
-              className="flex flex-col items-center gap-1 rounded-md border border-zinc-200 p-2 text-xs"
+              className="flex flex-col items-center gap-1 rounded-lg border border-[var(--border)] p-2 text-xs"
             >
-              <span className="font-semibold text-zinc-600">
+              <span className="font-semibold text-[var(--text-muted)]">
                 {formatSize(size)}
               </span>
               <input
@@ -128,40 +138,42 @@ export default function ProductForm({
                 min="0"
                 name={`size_${size}`}
                 defaultValue={sizeQuantities.get(size) ?? 0}
-                className="w-full rounded border border-zinc-300 px-1 py-1 text-center"
+                className="w-full rounded border border-[var(--border)] bg-[var(--surface)] px-1 py-1 text-center text-[var(--text)]"
               />
               <input
                 type="file"
                 name={`size_photo_${size}`}
                 accept="image/*"
-                className="w-full text-[10px] file:mr-1 file:rounded file:border-0 file:bg-zinc-100 file:px-1 file:py-0.5"
+                className="w-full text-[10px] text-[var(--text-muted)] file:mr-1 file:rounded file:border-0 file:bg-[var(--surface-hover)] file:px-1 file:py-0.5 file:text-[var(--text)]"
               />
             </div>
           ))}
         </div>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-zinc-700">
-        Outras fotos (gerais do produto)
-        <input
-          type="file"
-          name="images"
-          accept="image/*"
-          multiple
-          className="rounded-md border border-dashed border-zinc-300 px-3 py-4 text-sm"
-        />
-      </label>
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <label className={labelClass}>
+          Outras fotos (gerais do produto)
+          <input
+            type="file"
+            name="images"
+            accept="image/*"
+            multiple
+            className="rounded-lg border border-dashed border-[var(--border)] px-3 py-4 text-sm text-[var(--text-muted)] file:mr-2 file:rounded file:border-0 file:bg-[var(--surface-hover)] file:px-2 file:py-1 file:text-[var(--text)]"
+          />
+        </label>
+      </div>
 
       <div className="flex gap-3">
         <button
           type="submit"
-          className="rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+          className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
         >
           {submitLabel}
         </button>
         <Link
           href="/"
-          className="rounded-md border border-zinc-300 px-5 py-2 text-sm font-medium hover:bg-zinc-50"
+          className="rounded-lg border border-[var(--border)] px-5 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
         >
           Cancelar
         </Link>

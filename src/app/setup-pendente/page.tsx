@@ -11,12 +11,14 @@ export default function SetupPendentePage() {
         className="rounded-full"
         priority
       />
-      <h1 className="text-xl font-semibold">193 Shoes — quase lá!</h1>
-      <p className="text-sm text-zinc-600">
+      <h1 className="text-xl font-semibold text-[var(--text)]">
+        193 Shoes — quase lá!
+      </h1>
+      <p className="text-sm text-[var(--text-muted)]">
         O site já está publicado, mas ainda falta conectar o banco de dados
         (Supabase) para o estoque funcionar.
       </p>
-      <div className="rounded-md bg-amber-50 px-4 py-3 text-left text-sm text-amber-800">
+      <div className="rounded-lg bg-[var(--warning-bg)] px-4 py-3 text-left text-sm text-[var(--warning)]">
         <p className="font-medium">Falta configurar:</p>
         <ol className="mt-1 list-decimal pl-5">
           <li>Criar o projeto no Supabase</li>
@@ -29,7 +31,7 @@ export default function SetupPendentePage() {
           </li>
         </ol>
       </div>
-      <p className="text-xs text-zinc-400">
+      <p className="text-xs text-[var(--text-faint)]">
         O passo a passo completo está no README do repositório.
       </p>
     </main>
