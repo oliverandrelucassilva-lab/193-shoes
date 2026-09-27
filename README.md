@@ -26,6 +26,13 @@ login para acessar qualquer página.
 - Gestão dos modelos ("Modelos" no menu) — a loja cria os modelos que usa,
   já que calçados normalmente não têm nome próprio.
 - Alertas visuais de "estoque baixo" (≤3 pares) e "esgotado" (0 pares).
+- **Registrar venda**: na página do produto, escolhe o tamanho e a
+  quantidade e registra a saída — desconta do estoque e fica salvo no
+  histórico.
+- **Relatórios** ("Relatórios" no menu): resumo de quanto entrou e saiu de
+  estoque por mês, e uma lista detalhada de todas as movimentações,
+  filtrável por mês — dá controle administrativo sem precisar de planilha
+  separada.
 
 ## Configuração (passo a passo)
 
@@ -47,9 +54,12 @@ login para acessar qualquer página.
    acessam os dados).
 3. Em seguida, cole e execute também o arquivo
    [`supabase/migrations/0002_product_image_size.sql`](./supabase/migrations/0002_product_image_size.sql),
-   que habilita a foto por tamanho. Sempre que surgirem novos arquivos
-   `NNNN_*.sql` em `supabase/migrations/`, rode-os na ordem (pelo número)
-   no `SQL Editor`.
+   que habilita a foto por tamanho.
+4. Por fim, rode o arquivo
+   [`supabase/migrations/0003_stock_movements.sql`](./supabase/migrations/0003_stock_movements.sql),
+   que cria o histórico de entradas/saídas usado nos Relatórios. Sempre que
+   surgirem novos arquivos `NNNN_*.sql` em `supabase/migrations/`, rode-os
+   na ordem (pelo número) no `SQL Editor`.
 
 ### 3. Criar o usuário de acesso da loja
 
@@ -102,7 +112,8 @@ src/app/                 Páginas (App Router)
   produtos/novo/           Cadastro de produto
   produtos/[id]/           Edição de produto + ajuste de estoque
   categorias/              Gestão dos modelos de calçado
-src/components/          Componentes de UI (ProductCard, ProductForm, Nav)
+  relatorios/              Resumo mensal e histórico de entradas/saídas
+src/components/          Componentes de UI (ProductCard, ProductForm, Sidebar)
 src/lib/supabase/        Clientes Supabase (browser, server, middleware)
 supabase/migrations/     SQL do banco de dados
 ```

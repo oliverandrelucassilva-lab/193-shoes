@@ -39,3 +39,18 @@ export type ProductWithRelations = Product & {
   product_sizes: ProductSize[];
 };
 
+export type StockMovement = {
+  id: string;
+  product_id: string;
+  size: number;
+  type: "entrada" | "saida";
+  quantity: number;
+  created_at: string;
+};
+
+export type StockMovementWithProduct = StockMovement & {
+  product: (Pick<Product, "reference_code" | "color"> & {
+    category: Pick<Category, "name"> | null;
+  }) | null;
+};
+

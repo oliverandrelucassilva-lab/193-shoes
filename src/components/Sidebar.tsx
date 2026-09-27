@@ -40,12 +40,26 @@ const icons = {
       <circle cx="8" cy="8" r="1.4" fill="currentColor" />
     </svg>
   ),
+  relatorios: (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+      <path
+        d="M5 20V10M12 20V4M19 20v-7"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
 };
 
-const navItems = [
+const catalogItems = [
   { href: "/", label: "Estoque", icon: icons.estoque },
   { href: "/produtos/novo", label: "Novo produto", icon: icons.novo },
   { href: "/categorias", label: "Modelos", icon: icons.modelos },
+];
+
+const adminItems = [
+  { href: "/relatorios", label: "Relatórios", icon: icons.relatorios },
 ];
 
 export default function Sidebar({ userEmail }: { userEmail: string }) {
@@ -69,7 +83,17 @@ export default function Sidebar({ userEmail }: { userEmail: string }) {
         <span className="px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-faint)]">
           Catálogo
         </span>
-        {navItems.map((item) => (
+        {catalogItems.map((item) => (
+          <SidebarNavLink key={item.href} href={item.href}>
+            {item.icon}
+            {item.label}
+          </SidebarNavLink>
+        ))}
+
+        <span className="px-2 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-faint)]">
+          Administração
+        </span>
+        {adminItems.map((item) => (
           <SidebarNavLink key={item.href} href={item.href}>
             {item.icon}
             {item.label}

@@ -213,13 +213,12 @@ export async function uploadSizePhoto(
   revalidatePath(`/produtos/${productId}`);
 }
 
-export async function adjustStock(
+async function applyStockDelta(
+  supabase: Awaited<ReturnType<typeof createClient>>,
   productId: string,
   size: number,
   delta: number
 ) {
-  const supabase = await createClient();
-
   const { data: existing } = await supabase
     .from("product_sizes")
     .select("id, quantity")
@@ -227,7 +226,9 @@ export async function adjustStock(
     .eq("size", size)
     .maybeSingle();
 
-  const nextQuantity = Math.max(0, (existing?.quantity ?? 0) + delta);
+  const current = existing?.quantity ?? 0;
+  const nextQuantity = Math.max(0, current + delta);
+  const applied = nextQuantity - current;
 
   const { error } = await supabase
     .from("product_sizes")
@@ -238,6 +239,48 @@ export async function adjustStock(
 
   if (error) throw new Error(error.message);
 
+  if (applied !== 0) {
+    const { error: movementError } = await supabase
+      .from("stock_movements")
+      .insert({
+        product_id: productId,
+        size,
+        type: applied > 0 ? "entrada" : "saida",
+        quantity: Math.abs(applied),
+      });
+
+    if (movementError) throw new Error(movementError.message);
+  }
+}
+
+export async function adjustStock(
+  productId: string,
+  size: number,
+  delta: number
+) {
+  const supabase = await createClient();
+  await applyStockDelta(supabase, productId, size, delta);
+
   revalidatePath("/");
   revalidatePath(`/produtos/${productId}`);
+}
+
+export async function registerMovement(
+  productId: string,
+  size: number,
+  type: "entrada" | "saida",
+  formData: FormData
+) {
+  const quantity = Math.max(1, Number(formData.get("quantity") ?? 1) || 1);
+  const supabase = await createClient();
+  await applyStockDelta(
+    supabase,
+    productId,
+    size,
+    type === "entrada" ? quantity : -quantity
+  );
+
+  revalidatePath("/");
+  revalidatePath(`/produtos/${productId}`);
+  revalidatePath("/relatorios");
 }

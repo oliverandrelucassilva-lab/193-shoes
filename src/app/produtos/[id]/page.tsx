@@ -10,6 +10,7 @@ import {
   deleteProduct,
   deleteImage,
   adjustStock,
+  registerMovement,
   uploadSizePhoto,
 } from "@/app/produtos/actions";
 import type { ProductWithRelations } from "@/types/database";
@@ -129,27 +130,53 @@ export default async function EditProductPage({
                 key={s.id}
                 className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start"
               >
-                <div className="flex items-center gap-2 sm:w-32 sm:shrink-0">
-                  <span className="font-semibold text-[var(--text)]">
-                    {formatSize(s.size)}
-                  </span>
-                  <form action={adjustStock.bind(null, product.id, s.size, -1)}>
+                <div className="flex flex-col gap-2 sm:w-44 sm:shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-[var(--text)]">
+                      {formatSize(s.size)}
+                    </span>
+                    <form
+                      action={adjustStock.bind(null, product.id, s.size, -1)}
+                    >
+                      <button
+                        type="submit"
+                        className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
+                      >
+                        -
+                      </button>
+                    </form>
+                    <span className="w-5 text-center text-sm text-[var(--text)]">
+                      {s.quantity}
+                    </span>
+                    <form
+                      action={adjustStock.bind(null, product.id, s.size, 1)}
+                    >
+                      <button
+                        type="submit"
+                        className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
+                      >
+                        +
+                      </button>
+                    </form>
+                  </div>
+
+                  <form
+                    action={registerMovement.bind(null, product.id, s.size, "saida")}
+                    className="flex items-center gap-1"
+                  >
+                    <input
+                      type="number"
+                      name="quantity"
+                      min={1}
+                      defaultValue={1}
+                      className="w-12 rounded border border-[var(--border)] bg-[var(--surface)] px-1 py-1 text-center text-xs text-[var(--text)]"
+                    />
                     <button
                       type="submit"
-                      className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
+                      className="rounded-md bg-[var(--danger)] px-2 py-1 text-xs font-medium text-white hover:opacity-90"
+                      title="Registra a saída no histórico de movimentações"
                     >
-                      -
-                    </button>
-                  </form>
-                  <span className="w-5 text-center text-sm text-[var(--text)]">
-                    {s.quantity}
-                  </span>
-                  <form action={adjustStock.bind(null, product.id, s.size, 1)}>
-                    <button
-                      type="submit"
-                      className="h-6 w-6 rounded bg-[var(--surface-hover)] text-sm text-[var(--text)] hover:bg-[var(--border)]"
-                    >
-                      +
+                      Registrar venda
                     </button>
                   </form>
                 </div>
