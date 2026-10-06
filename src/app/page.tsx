@@ -1,175 +1,264 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import ProductCard from "@/components/ProductCard";
-import { SHOE_SIZES, formatSize } from "@/lib/sizes";
-import type { ProductWithRelations } from "@/types/database";
+import StatCard from "@/components/StatCard";
+import { productImageUrl } from "@/lib/image";
+import { formatSize } from "@/lib/sizes";
+import type {
+  ProductWithRelations,
+  StockMovementWithProduct,
+} from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = {
-  categoria?: string;
-  tamanho?: string;
-  busca?: string;
-  status?: string;
-};
+const LOW_STOCK_THRESHOLD = 3;
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParams>;
-}) {
-  const params = await searchParams;
+export default async function HomePage() {
   const supabase = await createClient();
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("*")
-    .order("name");
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
 
-  let query = supabase
-    .from("products")
-    .select(
-      "*, category:categories(*), product_images(*), product_sizes(*)"
-    )
-    .order("created_at", { ascending: false });
+  const [{ data: productsRaw, error: productsError }, { data: movementsRaw }] =
+    await Promise.all([
+      supabase
+        .from("products")
+        .select(
+          "*, category:categories(*), product_images(*), product_sizes(*)"
+        )
+        .eq("active", true)
+        .order("reference_code"),
+      supabase
+        .from("stock_movements")
+        .select(
+          "*, product:products(reference_code, color, category:categories(name))"
+        )
+        .gte("created_at", monthStart.toISOString())
+        .order("created_at", { ascending: false }),
+    ]);
 
-  if (params.categoria) {
-    query = query.eq("category_id", params.categoria);
+  const products = (productsRaw ?? []) as unknown as ProductWithRelations[];
+  const movements = (movementsRaw ??
+    []) as unknown as StockMovementWithProduct[];
+
+  const withTotals = products.map((p) => ({
+    product: p,
+    total: p.product_sizes.reduce((sum, s) => sum + s.quantity, 0),
+  }));
+
+  const totalPairs = withTotals.reduce((sum, p) => sum + p.total, 0);
+  const lowStock = withTotals
+    .filter((p) => p.total > 0 && p.total <= LOW_STOCK_THRESHOLD)
+    .sort((a, b) => a.total - b.total);
+  const outOfStock = withTotals.filter((p) => p.total === 0);
+
+  const entradasMes = movements
+    .filter((m) => m.type === "entrada")
+    .reduce((sum, m) => sum + m.quantity, 0);
+  const saidasMes = movements
+    .filter((m) => m.type === "saida")
+    .reduce((sum, m) => sum + m.quantity, 0);
+
+  const vendidosPorProduto = new Map<
+    string,
+    { label: string; quantity: number }
+  >();
+  for (const m of movements) {
+    if (m.type !== "saida") continue;
+    const label = m.product
+      ? `${m.product.reference_code}${m.product.color ? ` · ${m.product.color}` : ""}`
+      : "Produto removido";
+    const entry = vendidosPorProduto.get(m.product_id) ?? {
+      label,
+      quantity: 0,
+    };
+    entry.quantity += m.quantity;
+    vendidosPorProduto.set(m.product_id, entry);
   }
-  if (params.busca) {
-    const term = params.busca.trim();
-    query = query.or(
-      `reference_code.ilike.%${term}%,color.ilike.%${term}%,description.ilike.%${term}%`
-    );
-  }
-  if (params.status === "inativos") {
-    query = query.eq("active", false);
-  } else if (params.status !== "todos") {
-    query = query.eq("active", true);
-  }
-
-  const { data: productsRaw, error } = await query;
-  let products = (productsRaw ?? []) as unknown as ProductWithRelations[];
-
-  if (params.tamanho) {
-    const size = Number(params.tamanho);
-    products = products.filter((p) =>
-      p.product_sizes.some((s) => s.size === size && s.quantity > 0)
-    );
-  }
-
-  const totalPairs = products.reduce(
-    (sum, p) =>
-      sum + p.product_sizes.reduce((s, size) => s + size.quantity, 0),
-    0
-  );
+  const maisVendidos = [...vendidosPorProduto.values()]
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-[var(--text)]">
-            Estoque
-          </h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            {products.length} produto(s) · {totalPairs} par(es) em estoque
-          </p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold text-[var(--text)]">Início</h1>
+        <p className="text-sm text-[var(--text-muted)]">
+          Visão geral do estoque da 193 Shoes.
+        </p>
       </div>
 
-      <form
-        method="get"
-        className="mb-6 grid grid-cols-2 gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:grid-cols-4"
-      >
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
-          Buscar (código, cor...)
-          <input
-            type="text"
-            name="busca"
-            defaultValue={params.busca}
-            placeholder="Ex: REF-1023"
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
-          Modelo
-          <select
-            name="categoria"
-            defaultValue={params.categoria ?? ""}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
-          >
-            <option value="">Todos</option>
-            {(categories ?? []).map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
-          Tamanho
-          <select
-            name="tamanho"
-            defaultValue={params.tamanho ?? ""}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
-          >
-            <option value="">Todos</option>
-            {SHOE_SIZES.map((s) => (
-              <option key={s} value={s}>
-                {formatSize(s)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--text-muted)]">
-          Status
-          <select
-            name="status"
-            defaultValue={params.status ?? "ativos"}
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm text-[var(--text)]"
-          >
-            <option value="ativos">Ativos</option>
-            <option value="inativos">Inativos</option>
-            <option value="todos">Todos</option>
-          </select>
-        </label>
-
-        <div className="col-span-2 flex items-end gap-2 sm:col-span-4">
-          <button
-            type="submit"
-            className="rounded-lg bg-[var(--accent)] px-4 py-1.5 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
-          >
-            Filtrar
-          </button>
-          <Link
-            href="/"
-            className="rounded-lg border border-[var(--border)] px-4 py-1.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
-          >
-            Limpar
-          </Link>
-        </div>
-      </form>
-
-      {error && (
-        <p className="rounded-lg bg-[var(--danger-bg)] px-3 py-2 text-sm text-[var(--danger)]">
-          Erro ao carregar produtos: {error.message}
+      {productsError && (
+        <p className="mb-6 rounded-lg bg-[var(--danger-bg)] px-3 py-2 text-sm text-[var(--danger)]">
+          Erro ao carregar dados: {productsError.message}
         </p>
       )}
 
-      {!error && products.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-[var(--border)] p-10 text-center text-sm text-[var(--text-muted)]">
-          Nenhum produto encontrado com esses filtros.
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Produtos ativos" value={products.length} />
+        <StatCard label="Pares em estoque" value={totalPairs} />
+        <StatCard
+          label="Estoque baixo"
+          value={lowStock.length}
+          tone={lowStock.length > 0 ? "warning" : "neutral"}
+        />
+        <StatCard
+          label="Esgotados"
+          value={outOfStock.length}
+          tone={outOfStock.length > 0 ? "danger" : "neutral"}
+        />
       </div>
+
+      <div className="mb-8 grid grid-cols-2 gap-4">
+        <StatCard
+          label="Entradas este mês"
+          value={`+${entradasMes}`}
+          tone="success"
+        />
+        <StatCard
+          label="Saídas este mês"
+          value={`-${saidasMes}`}
+          tone="danger"
+        />
+      </div>
+
+      <section className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[var(--text)]">
+            Estoque baixo
+          </h2>
+          <Link
+            href="/estoque"
+            className="text-xs font-medium text-[var(--accent)] hover:underline"
+          >
+            Ver estoque completo
+          </Link>
+        </div>
+        {lowStock.length === 0 ? (
+          <p className="text-sm text-[var(--text-faint)]">
+            Nenhum produto com estoque baixo no momento.
+          </p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-[var(--border)]">
+            {lowStock.map(({ product, total }) => {
+              const cover = product.product_images[0];
+              const lowSizes = product.product_sizes
+                .filter((s) => s.quantity > 0)
+                .sort((a, b) => a.size - b.size);
+              return (
+                <li key={product.id} className="flex items-center gap-3 py-3">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[var(--surface-hover)]">
+                    {cover && (
+                      <Image
+                        src={productImageUrl(cover.storage_path)}
+                        alt={product.reference_code}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/produtos/${product.id}`}
+                      className="text-sm font-medium text-[var(--text)] hover:underline"
+                    >
+                      {product.reference_code}
+                    </Link>
+                    <p className="truncate text-xs text-[var(--text-muted)]">
+                      {product.category?.name ?? "Sem modelo"}
+                      {product.color ? ` · ${product.color}` : ""} ·{" "}
+                      {lowSizes
+                        .map((s) => `${formatSize(s.size)} (${s.quantity})`)
+                        .join(", ")}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[var(--warning-bg)] px-2 py-0.5 text-xs font-medium text-[var(--warning)]">
+                    {total} par(es)
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[var(--text)]">
+            Esgotados
+          </h2>
+          <Link
+            href="/estoque?status=ativos"
+            className="text-xs font-medium text-[var(--accent)] hover:underline"
+          >
+            Ver estoque completo
+          </Link>
+        </div>
+        {outOfStock.length === 0 ? (
+          <p className="text-sm text-[var(--text-faint)]">
+            Nenhum produto esgotado no momento.
+          </p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-[var(--border)]">
+            {outOfStock.map(({ product }) => (
+              <li key={product.id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/produtos/${product.id}`}
+                    className="text-sm font-medium text-[var(--text)] hover:underline"
+                  >
+                    {product.reference_code}
+                  </Link>
+                  <p className="truncate text-xs text-[var(--text-muted)]">
+                    {product.category?.name ?? "Sem modelo"}
+                    {product.color ? ` · ${product.color}` : ""}
+                  </p>
+                </div>
+                <span className="rounded-full bg-[var(--danger-bg)] px-2 py-0.5 text-xs font-medium text-[var(--danger)]">
+                  Esgotado
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-[var(--text)]">
+            Mais vendidos este mês
+          </h2>
+          <Link
+            href="/relatorios"
+            className="text-xs font-medium text-[var(--accent)] hover:underline"
+          >
+            Ver relatórios
+          </Link>
+        </div>
+        {maisVendidos.length === 0 ? (
+          <p className="text-sm text-[var(--text-faint)]">
+            Nenhuma venda registrada este mês ainda.
+          </p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-[var(--border)]">
+            {maisVendidos.map((item, index) => (
+              <li
+                key={item.label + index}
+                className="flex items-center justify-between py-2 text-sm"
+              >
+                <span className="text-[var(--text)]">
+                  {index + 1}. {item.label}
+                </span>
+                <span className="font-medium text-[var(--text)]">
+                  {item.quantity} vendido(s)
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

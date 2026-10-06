@@ -13,6 +13,7 @@ export async function createCategory(formData: FormData) {
 
   revalidatePath("/categorias");
   revalidatePath("/");
+  revalidatePath("/estoque");
 }
 
 export async function renameCategory(id: string, formData: FormData) {
@@ -28,6 +29,7 @@ export async function renameCategory(id: string, formData: FormData) {
 
   revalidatePath("/categorias");
   revalidatePath("/");
+  revalidatePath("/estoque");
 }
 
 export async function deleteCategory(id: string) {
@@ -49,4 +51,5 @@ export async function deleteCategory(id: string) {
 
   revalidatePath("/categorias");
   revalidatePath("/");
+  revalidatePath("/estoque");
 }

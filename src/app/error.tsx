@@ -23,7 +23,10 @@ export default function GlobalError({
       >
         Tentar novamente
       </button>
-      <Link href="/" className="text-sm text-[var(--text-muted)] underline">
+      <Link
+        href="/estoque"
+        className="text-sm text-[var(--text-muted)] underline"
+      >
         Voltar para o estoque
       </Link>
     </main>

@@ -3,6 +3,16 @@ import SidebarNavLink from "@/components/SidebarNavLink";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const icons = {
+  inicio: (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+      <path
+        d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8.5Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   estoque: (
     <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
       <path
@@ -52,8 +62,10 @@ const icons = {
   ),
 };
 
+const homeItems = [{ href: "/", label: "Início", icon: icons.inicio }];
+
 const catalogItems = [
-  { href: "/", label: "Estoque", icon: icons.estoque },
+  { href: "/estoque", label: "Estoque", icon: icons.estoque },
   { href: "/produtos/novo", label: "Novo produto", icon: icons.novo },
   { href: "/categorias", label: "Modelos", icon: icons.modelos },
 ];
@@ -80,7 +92,14 @@ export default function Sidebar({ userEmail }: { userEmail: string }) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-2">
-        <span className="px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-faint)]">
+        {homeItems.map((item) => (
+          <SidebarNavLink key={item.href} href={item.href}>
+            {item.icon}
+            {item.label}
+          </SidebarNavLink>
+        ))}
+
+        <span className="px-2 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-faint)]">
           Catálogo
         </span>
         {catalogItems.map((item) => (

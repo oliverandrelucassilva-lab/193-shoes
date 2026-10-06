@@ -114,6 +114,7 @@ export async function createProduct(formData: FormData) {
   await uploadImages(supabase, product.id, formData);
 
   revalidatePath("/");
+  revalidatePath("/estoque");
   redirect(`/produtos/${product.id}`);
 }
 
@@ -132,6 +133,7 @@ export async function updateProduct(productId: string, formData: FormData) {
   await uploadImages(supabase, productId, formData);
 
   revalidatePath("/");
+  revalidatePath("/estoque");
   revalidatePath(`/produtos/${productId}`);
   redirect(`/produtos/${productId}`);
 }
@@ -158,7 +160,8 @@ export async function deleteProduct(productId: string) {
   if (error) throw new Error(error.message);
 
   revalidatePath("/");
-  redirect("/");
+  revalidatePath("/estoque");
+  redirect("/estoque");
 }
 
 export async function deleteImage(imageId: string, productId: string) {
@@ -262,6 +265,7 @@ export async function adjustStock(
   await applyStockDelta(supabase, productId, size, delta);
 
   revalidatePath("/");
+  revalidatePath("/estoque");
   revalidatePath(`/produtos/${productId}`);
 }
 
@@ -281,6 +285,7 @@ export async function registerMovement(
   );
 
   revalidatePath("/");
+  revalidatePath("/estoque");
   revalidatePath(`/produtos/${productId}`);
   revalidatePath("/relatorios");
 }

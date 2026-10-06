@@ -172,7 +172,7 @@ export default function ProductForm({
           {submitLabel}
         </button>
         <Link
-          href="/"
+          href="/estoque"
           className="rounded-lg border border-[var(--border)] px-5 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-hover)]"
         >
           Cancelar

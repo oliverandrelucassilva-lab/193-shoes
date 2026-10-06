@@ -12,6 +12,10 @@ login para acessar qualquer página.
 ## Funcionalidades
 
 - Login único/multiusuário via Supabase Auth (e-mail e senha).
+- **Início** (tela inicial/dashboard): métricas gerais (produtos ativos,
+  pares em estoque, entradas/saídas do mês), lista de produtos com
+  **estoque baixo** e **esgotados**, e os mais vendidos do mês — tudo num
+  só lugar, sem precisar entrar em cada produto.
 - Estoque com filtro por **modelo**, **tamanho**, **busca por código/cor**
   e status (ativos/inativos).
 - Cada produto tem: código de referência, modelo, cor, preço, preço de
@@ -107,7 +111,8 @@ O jeito mais simples é publicar na [Vercel](https://vercel.com):
 
 ```
 src/app/                 Páginas (App Router)
-  page.tsx                Estoque com filtros (tela inicial)
+  page.tsx                Início: métricas, estoque baixo, esgotados
+  estoque/                 Catálogo com filtros (modelo, tamanho, busca)
   login/                   Tela de login
   produtos/novo/           Cadastro de produto
   produtos/[id]/           Edição de produto + ajuste de estoque
