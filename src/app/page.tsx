@@ -64,6 +64,7 @@ export default async function HomePage() {
     string,
     { label: string; quantity: number }
   >();
+  const vendidosPorModelo = new Map<string, number>();
   for (const m of movements) {
     if (m.type !== "saida") continue;
     const label = m.product
@@ -75,9 +76,18 @@ export default async function HomePage() {
     };
     entry.quantity += m.quantity;
     vendidosPorProduto.set(m.product_id, entry);
+
+    const modeloLabel = m.product?.category?.name ?? "Sem modelo";
+    vendidosPorModelo.set(
+      modeloLabel,
+      (vendidosPorModelo.get(modeloLabel) ?? 0) + m.quantity
+    );
   }
   const maisVendidos = [...vendidosPorProduto.values()]
     .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
+  const modelosMaisVendidos = [...vendidosPorModelo.entries()]
+    .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
 
   return (
@@ -237,27 +247,61 @@ export default async function HomePage() {
             Ver relatórios
           </Link>
         </div>
-        {maisVendidos.length === 0 ? (
-          <p className="text-sm text-[var(--text-faint)]">
-            Nenhuma venda registrada este mês ainda.
-          </p>
-        ) : (
-          <ul className="flex flex-col divide-y divide-[var(--border)]">
-            {maisVendidos.map((item, index) => (
-              <li
-                key={item.label + index}
-                className="flex items-center justify-between py-2 text-sm"
-              >
-                <span className="text-[var(--text)]">
-                  {index + 1}. {item.label}
-                </span>
-                <span className="font-medium text-[var(--text)]">
-                  {item.quantity} vendido(s)
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+              Produtos
+            </h3>
+            {maisVendidos.length === 0 ? (
+              <p className="text-sm text-[var(--text-faint)]">
+                Nenhuma venda registrada este mês ainda.
+              </p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--border)]">
+                {maisVendidos.map((item, index) => (
+                  <li
+                    key={item.label + index}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <span className="text-[var(--text)]">
+                      {index + 1}. {item.label}
+                    </span>
+                    <span className="font-medium text-[var(--text)]">
+                      {item.quantity}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+              Modelos
+            </h3>
+            {modelosMaisVendidos.length === 0 ? (
+              <p className="text-sm text-[var(--text-faint)]">
+                Nenhuma venda registrada este mês ainda.
+              </p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--border)]">
+                {modelosMaisVendidos.map(([label, quantity], index) => (
+                  <li
+                    key={label}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <span className="text-[var(--text)]">
+                      {index + 1}. {label}
+                    </span>
+                    <span className="font-medium text-[var(--text)]">
+                      {quantity}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </section>
     </main>
   );

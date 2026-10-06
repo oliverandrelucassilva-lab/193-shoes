@@ -68,6 +68,37 @@ export default async function RelatoriosPage({
     ? movements
     : movements.filter((m) => monthKey(m.created_at) === selectedMonth);
 
+  const vendasPorProduto = new Map<
+    string,
+    { label: string; quantity: number }
+  >();
+  const vendasPorModelo = new Map<string, number>();
+  for (const m of filteredMovements) {
+    if (m.type !== "saida") continue;
+    const produtoLabel = m.product
+      ? `${m.product.reference_code}${m.product.color ? ` · ${m.product.color}` : ""}`
+      : "Produto removido";
+    const produtoEntry = vendasPorProduto.get(m.product_id) ?? {
+      label: produtoLabel,
+      quantity: 0,
+    };
+    produtoEntry.quantity += m.quantity;
+    vendasPorProduto.set(m.product_id, produtoEntry);
+
+    const modeloLabel = m.product?.category?.name ?? "Sem modelo";
+    vendasPorModelo.set(
+      modeloLabel,
+      (vendasPorModelo.get(modeloLabel) ?? 0) + m.quantity
+    );
+  }
+
+  const topProdutos = [...vendasPorProduto.values()]
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
+  const topModelos = [...vendasPorModelo.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-6">
       <h1 className="mb-1 text-2xl font-semibold text-[var(--text)]">
@@ -140,6 +171,70 @@ export default async function RelatoriosPage({
             </table>
           </div>
         )}
+      </section>
+
+      <section className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        <h2 className="mb-1 text-base font-semibold text-[var(--text)]">
+          Mais vendidos
+        </h2>
+        <p className="mb-4 text-xs text-[var(--text-muted)]">
+          {isAll ? "Em todo o período" : monthLabel(selectedMonth)}
+        </p>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+              Produtos
+            </h3>
+            {topProdutos.length === 0 ? (
+              <p className="text-sm text-[var(--text-faint)]">
+                Nenhuma venda neste período.
+              </p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--border)]">
+                {topProdutos.map((item, index) => (
+                  <li
+                    key={item.label + index}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <span className="text-[var(--text)]">
+                      {index + 1}. {item.label}
+                    </span>
+                    <span className="font-medium text-[var(--text)]">
+                      {item.quantity}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-faint)]">
+              Modelos
+            </h3>
+            {topModelos.length === 0 ? (
+              <p className="text-sm text-[var(--text-faint)]">
+                Nenhuma venda neste período.
+              </p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-[var(--border)]">
+                {topModelos.map(([label, quantity], index) => (
+                  <li
+                    key={label}
+                    className="flex items-center justify-between py-2 text-sm"
+                  >
+                    <span className="text-[var(--text)]">
+                      {index + 1}. {label}
+                    </span>
+                    <span className="font-medium text-[var(--text)]">
+                      {quantity}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
       </section>
 
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
