@@ -173,7 +173,7 @@ export default async function EditProductPage({
                     />
                     <button
                       type="submit"
-                      className="rounded-md bg-[var(--danger)] px-2 py-1 text-xs font-medium text-white hover:opacity-90"
+                      className="rounded-md bg-[var(--accent)] px-2 py-1 text-xs font-medium text-[var(--accent-foreground)] hover:bg-[var(--accent-hover)]"
                       title="Registra a saída no histórico de movimentações"
                     >
                       Registrar venda

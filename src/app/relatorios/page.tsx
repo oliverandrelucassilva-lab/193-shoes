@@ -129,7 +129,7 @@ export default async function RelatoriosPage({
                 <tr className="text-xs uppercase tracking-wide text-[var(--text-faint)]">
                   <th className="pb-2 pr-4 font-medium">Mês</th>
                   <th className="pb-2 pr-4 font-medium">Entradas</th>
-                  <th className="pb-2 pr-4 font-medium">Saídas</th>
+                  <th className="pb-2 pr-4 font-medium">Saídas (vendas)</th>
                   <th className="pb-2 pr-4 font-medium">Saldo</th>
                   <th className="pb-2 font-medium"></th>
                 </tr>
@@ -145,8 +145,8 @@ export default async function RelatoriosPage({
                       <td className="py-2 pr-4 text-[var(--success)]">
                         +{entradas}
                       </td>
-                      <td className="py-2 pr-4 text-[var(--danger)]">
-                        -{saidas}
+                      <td className="py-2 pr-4 text-[var(--accent)]">
+                        {saidas}
                       </td>
                       <td className="py-2 pr-4 font-medium text-[var(--text)]">
                         {entradas - saidas}
@@ -295,7 +295,7 @@ export default async function RelatoriosPage({
                           "rounded-full px-2 py-0.5 text-xs font-medium " +
                           (m.type === "entrada"
                             ? "bg-[var(--success-bg)] text-[var(--success)]"
-                            : "bg-[var(--danger-bg)] text-[var(--danger)]")
+                            : "bg-[var(--accent-bg)] text-[var(--accent)]")
                         }
                       >
                         {m.type === "entrada" ? "Entrada" : "Saída"}

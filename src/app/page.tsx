@@ -13,12 +13,20 @@ export const dynamic = "force-dynamic";
 
 const LOW_STOCK_THRESHOLD = 3;
 
+function percentDelta(current: number, previous: number): number | null {
+  if (previous === 0) return null;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
 export default async function HomePage() {
   const supabase = await createClient();
 
   const monthStart = new Date();
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
+
+  const previousMonthStart = new Date(monthStart);
+  previousMonthStart.setMonth(previousMonthStart.getMonth() - 1);
 
   const [{ data: productsRaw, error: productsError }, { data: movementsRaw }] =
     await Promise.all([
@@ -34,13 +42,20 @@ export default async function HomePage() {
         .select(
           "*, product:products(reference_code, color, category:categories(name))"
         )
-        .gte("created_at", monthStart.toISOString())
+        .gte("created_at", previousMonthStart.toISOString())
         .order("created_at", { ascending: false }),
     ]);
 
   const products = (productsRaw ?? []) as unknown as ProductWithRelations[];
-  const movements = (movementsRaw ??
+  const allMovements = (movementsRaw ??
     []) as unknown as StockMovementWithProduct[];
+
+  const movements = allMovements.filter(
+    (m) => new Date(m.created_at) >= monthStart
+  );
+  const previousMovements = allMovements.filter(
+    (m) => new Date(m.created_at) < monthStart
+  );
 
   const withTotals = products.map((p) => ({
     product: p,
@@ -59,6 +74,14 @@ export default async function HomePage() {
   const saidasMes = movements
     .filter((m) => m.type === "saida")
     .reduce((sum, m) => sum + m.quantity, 0);
+  const entradasMesAnterior = previousMovements
+    .filter((m) => m.type === "entrada")
+    .reduce((sum, m) => sum + m.quantity, 0);
+  const saidasMesAnterior = previousMovements
+    .filter((m) => m.type === "saida")
+    .reduce((sum, m) => sum + m.quantity, 0);
+  const deltaEntradas = percentDelta(entradasMes, entradasMesAnterior);
+  const deltaSaidas = percentDelta(saidasMes, saidasMesAnterior);
 
   const vendidosPorProduto = new Map<
     string,
@@ -125,11 +148,13 @@ export default async function HomePage() {
           label="Entradas este mês"
           value={`+${entradasMes}`}
           tone="success"
+          delta={deltaEntradas}
         />
         <StatCard
-          label="Saídas este mês"
-          value={`-${saidasMes}`}
-          tone="danger"
+          label="Saídas (vendas) este mês"
+          value={`${saidasMes}`}
+          tone="accent"
+          delta={deltaSaidas}
         />
       </div>
 
